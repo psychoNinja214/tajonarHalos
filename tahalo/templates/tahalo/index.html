@@ -1,11 +1,92 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tajonar Halos</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cool Dummy Website</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #111, #333);
+      color: white;
+    }
+    header {
+      padding: 2rem;
+      text-align: center;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    h1 {
+      font-size: 3rem;
+      margin: 0;
+      letter-spacing: 2px;
+    }
+    p.subtitle {
+      margin-top: 0.5rem;
+      opacity: 0.8;
+    }
+    .section {
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+    .card-container {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+    .card {
+      background: rgba(255,255,255,0.08);
+      padding: 2rem;
+      width: 250px;
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+      transition: transform 0.3s ease, background 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-10px);
+      background: rgba(255,255,255,0.15);
+    }
+    footer {
+      text-align: center;
+      padding: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.7;
+    }
+  </style>
 </head>
 <body>
-    <h1>Luis is scared of girls</h1>
+  <header>
+    <h1>My Cool Sandbox Site</h1>
+    <p class="subtitle">A slick dummy page so your server doesn't look empty.</p>
+  </header>
+
+  <div class="section">
+    <h2>What This Site Is</h2>
+    <p>Just a nice looking placeholder so your setup looks legit.</p>
+
+    <div class="card-container">
+      <div class="card">
+        <h3>Fast</h3>
+        <p>Loads instantly. Because there's nothing here.</p>
+      </div>
+      <div class="card">
+        <h3>Clean</h3>
+        <p>Smooth gradients, soft blur, good vibes.</p>
+      </div>
+      <div class="card">
+        <h3>Dummy</h3>
+        <p>Absolutely zero real content. Perfect.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © 2025 Dummy Sandbox Page
+  </footer>
 </body>
 </html>
