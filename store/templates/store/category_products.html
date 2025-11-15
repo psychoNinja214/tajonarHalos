@@ -1,0 +1,32 @@
+{% extends "store/base.html" %}
+
+{% block title %}{{ category.name }} - eCommerce Store{% endblock %}
+
+{% block content %}
+<h2>{{ category.name }}</h2>
+<p>{{ category.description }}</p>
+
+<div class="categories">
+    <a href="{% url 'store:product_list' %}" class="category-tag">← All Products</a>
+</div>
+
+<div class="product-grid">
+    {% for product in products %}
+    <div class="product-card">
+        {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 250px; object-fit: cover;">
+        {% else %}
+            <div class="product-image">📦</div>
+        {% endif %}
+        <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p>{{ product.description|truncatewords:15 }}</p>
+            <div class="product-price">${{ product.price }}</div>
+            <a href="{% url 'store:product_detail' product.slug %}" class="btn">View Details</a>
+        </div>
+    </div>
+    {% empty %}
+    <p>No products in this category.</p>
+    {% endfor %}
+</div>
+{% endblock %}

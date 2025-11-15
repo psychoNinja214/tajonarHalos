@@ -1,0 +1,38 @@
+{% extends "store/base.html" %}
+
+{% block title %}{{ product.name }} - eCommerce Store{% endblock %}
+
+{% block content %}
+<div class="product-detail">
+    <div>
+         {% if product.image %}
+            <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 100%; height: 250px; object-fit: cover;">
+        {% else %}
+            <div class="product-image">📦</div>
+        {% endif %}
+    </div>
+    <div class="product-detail-info">
+        <h1>{{ product.name }}</h1>
+        <div class="product-price">${{ product.price }}</div>
+        
+        {% if product.stock > 0 %}
+        <p class="stock-info">✓ In Stock ({{ product.stock }} available)</p>
+        <button class="btn btn-success">Add to Cart</button>
+        {% else %}
+        <p class="stock-info out-of-stock">✗ Out of Stock</p>
+        {% endif %}
+        
+        <hr style="margin: 2rem 0;">
+        
+        <h3>Description</h3>
+        <p>{{ product.description }}</p>
+        
+        <hr style="margin: 2rem 0;">
+        
+        <p><strong>Category:</strong> {{ product.category.name }}</p>
+        <p><strong>SKU:</strong> {{ product.id }}</p>
+        
+        <a href="{% url 'store:product_list' %}" class="btn" style="margin-top: 2rem;">← Back to Products</a>
+    </div>
+</div>
+{% endblock %}
