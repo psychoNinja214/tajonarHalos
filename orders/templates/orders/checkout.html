@@ -1,0 +1,147 @@
+{% extends "store/base.html" %}
+
+{% block title %}Checkout - eCommerce Store{% endblock %}
+
+{% block content %}
+<style>
+    .checkout-container { display: grid; grid-template-columns: 1fr 400px; gap: 2rem; }
+    .checkout-form { background: white; padding: 2rem; border-radius: 8px; }
+    .order-summary { background: white; padding: 2rem; border-radius: 8px; position: sticky; top: 2rem; height: fit-content; }
+    
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #2c3e50; }
+    .form-input { width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; }
+    .form-input:focus { outline: none; border-color: #3498db; }
+    
+    .summary-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #ecf0f1; }
+    .summary-item:last-child { border-bottom: none; }
+    .summary-total { font-size: 1.3rem; font-weight: bold; color: #2c3e50; padding-top: 1rem; border-top: 2px solid #bdc3c7; margin-top: 1rem; }
+    
+    .mini-cart-item { display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid #ecf0f1; }
+    .mini-cart-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .mini-item-image { width: 60px; height: 60px; background: #ecf0f1; border-radius: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .mini-item-image img { width: 100%; height: 100%; object-fit: cover; }
+    .mini-item-info { flex: 1; }
+    .mini-item-info h4 { font-size: 0.9rem; margin-bottom: 0.25rem; color: #2c3e50; }
+    .mini-item-info p { font-size: 0.8rem; color: #7f8c8d; }
+    
+    .error { color: #e74c3c; font-size: 0.9rem; margin-top: 0.25rem; }
+    
+    @media (max-width: 968px) {
+        .checkout-container { grid-template-columns: 1fr; }
+        .order-summary { position: static; }
+    }
+</style>
+
+<div class="checkout-container">
+    <div class="checkout-form">
+        <h2>Shipping Information</h2>
+        
+        {% if messages %}
+        <div class="messages" style="margin-bottom: 1rem;">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <form method="post">
+            {% csrf_token %}
+            
+            <div class="form-group">
+                <label for="{{ form.first_name.id_for_label }}">First Name *</label>
+                {{ form.first_name }}
+                {% if form.first_name.errors %}
+                    <div class="error">{{ form.first_name.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.last_name.id_for_label }}">Last Name *</label>
+                {{ form.last_name }}
+                {% if form.last_name.errors %}
+                    <div class="error">{{ form.last_name.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.email.id_for_label }}">Email *</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <div class="error">{{ form.email.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.address.id_for_label }}">Address *</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                    <div class="error">{{ form.address.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.city.id_for_label }}">City *</label>
+                {{ form.city }}
+                {% if form.city.errors %}
+                    <div class="error">{{ form.city.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                <label for="{{ form.postal_code.id_for_label }}">Postal Code *</label>
+                {{ form.postal_code }}
+                {% if form.postal_code.errors %}
+                    <div class="error">{{ form.postal_code.errors }}</div>
+                {% endif %}
+            </div>
+            
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <a href="{% url 'cart:cart_detail' %}" class="btn">Back to Cart</a>
+                <button type="submit" class="btn btn-success" style="flex: 1;">Place Order</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="order-summary">
+        <h3>Order Summary</h3>
+        
+        <div style="margin: 1.5rem 0;">
+            {% for item in cart_items %}
+            <div class="mini-cart-item">
+                <div class="mini-item-image">
+                    {% if item.product.image %}
+                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}">
+                    {% else %}
+                    📦
+                    {% endif %}
+                </div>
+                <div class="mini-item-info">
+                    <h4>{{ item.product.name }}</h4>
+                    <p>Qty: {{ item.quantity }} × ${{ item.product.price }}</p>
+                </div>
+                <strong>${{ item.get_subtotal }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="summary-item">
+            <span>Subtotal</span>
+            <strong>${{ cart.get_total }}</strong>
+        </div>
+        
+        <div class="summary-item">
+            <span>Shipping</span>
+            <strong>Free</strong>
+        </div>
+        
+        <div class="summary-total">
+            <div style="display: flex; justify-content: space-between;">
+                <span>Total</span>
+                <span>${{ cart.get_total }}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -17,7 +17,7 @@
         
         {% if product.stock > 0 %}
         <p class="stock-info">✓ In Stock ({{ product.stock }} available)</p>
-        <button class="btn btn-success">Add to Cart</button>
+        <a href="{% url 'cart:add_to_cart' product.id %}" class="btn btn-success">Add to Cart</a>
         {% else %}
         <p class="stock-info out-of-stock">✗ Out of Stock</p>
         {% endif %}

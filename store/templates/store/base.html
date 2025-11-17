@@ -53,12 +53,15 @@
 <body>
     <header>
         <nav>
-            <h1>🛒 Tajonar Halos</h1>
-            <ul>
-                <li><a href="{% url 'store:product_list' %}">Products</a></li>
-                <li><a href="#">Cart (0)</a></li>
-                <li><a href="/admin/">Admin</a></li>
-            </ul>
+    <h1>🛒 Tajonar Halos</h1>
+    <ul>
+        <li><a href="{% url 'store:product_list' %}">Products</a></li>
+        <li><a href="{% url 'cart:cart_detail' %}">🛒 Cart ({{ cart_count }})</a></li>
+        {% if user.is_authenticated %}
+        <li><a href="{% url 'orders:order_history' %}">Orders</a></li>
+        {% endif %}
+        <li><a href="/admin/">Admin</a></li>
+    </ul>
         </nav>
     </header>
     

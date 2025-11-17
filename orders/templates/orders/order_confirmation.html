@@ -1,0 +1,74 @@
+{% extends "store/base.html" %}
+
+{% block title %}Order Confirmation - eCommerce Store{% endblock %}
+
+{% block content %}
+<style>
+    .confirmation-container { max-width: 800px; margin: 0 auto; background: white; padding: 3rem; border-radius: 8px; text-align: center; }
+    .success-icon { font-size: 5rem; color: #27ae60; margin-bottom: 1rem; }
+    .order-number { font-size: 1.2rem; color: #7f8c8d; margin: 1rem 0; }
+    .order-details { background: #ecf0f1; padding: 2rem; border-radius: 8px; margin: 2rem 0; text-align: left; }
+    .detail-row { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid #bdc3c7; }
+    .detail-row:last-child { border-bottom: none; }
+    .order-items { margin-top: 2rem; }
+    .order-item { display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #bdc3c7; }
+</style>
+
+<div class="confirmation-container">
+    <div class="success-icon">✓</div>
+    <h1>Order Confirmed!</h1>
+    <p class="order-number">Order #{{ order.id }}</p>
+    <p>Thank you for your purchase. We've sent a confirmation email to <strong>{{ order.email }}</strong></p>
+    
+    <div class="order-details">
+        <h3>Order Details</h3>
+        
+        <div class="detail-row">
+            <span>Order Number:</span>
+            <strong>#{{ order.id }}</strong>
+        </div>
+        
+        <div class="detail-row">
+            <span>Order Date:</span>
+            <strong>{{ order.created_at|date:"F d, Y" }}</strong>
+        </div>
+        
+        <div class="detail-row">
+            <span>Status:</span>
+            <strong style="color: #f39c12;">{{ order.get_status_display }}</strong>
+        </div>
+        
+        <div class="detail-row">
+            <span>Total:</span>
+            <strong style="color: #27ae60; font-size: 1.3rem;">${{ order.total }}</strong>
+        </div>
+        
+        <div class="order-items">
+            <h4>Items Ordered:</h4>
+            {% for item in order.items.all %}
+            <div class="order-item">
+                <span>{{ item.quantity }} × {{ item.product.name }}</span>
+                <strong>${{ item.price }}</strong>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div style="margin-top: 2rem;">
+            <h4>Shipping Address:</h4>
+            <p>
+                {{ order.first_name }} {{ order.last_name }}<br>
+                {{ order.address }}<br>
+                {{ order.city }}, {{ order.postal_code }}
+            </p>
+        </div>
+    </div>
+    
+    <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 2rem;">
+        <a href="{% url 'store:product_list' %}" class="btn">Continue Shopping</a>
+        {% if user.is_authenticated %}
+        <a href="{% url 'orders:order_history' %}" class="btn btn-success">View Order History</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+

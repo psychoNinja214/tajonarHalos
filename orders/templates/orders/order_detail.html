@@ -1,0 +1,76 @@
+{% extends "store/base.html" %}
+
+{% block title %}Order #{{ order.id }} - eCommerce Store{% endblock %}
+
+{% block content %}
+<style>
+    .order-detail-container { background: white; padding: 2rem; border-radius: 8px; max-width: 900px; margin: 0 auto; }
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid #ecf0f1; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0; }
+    .info-section { background: #ecf0f1; padding: 1.5rem; border-radius: 8px; }
+    .info-section h3 { margin-bottom: 1rem; color: #2c3e50; }
+    .order-items-table { width: 100%; border-collapse: collapse; margin: 2rem 0; }
+    .order-items-table th { background: #ecf0f1; padding: 1rem; text-align: left; }
+    .order-items-table td { padding: 1rem; border-bottom: 1px solid #ecf0f1; }
+</style>
+
+<div class="order-detail-container">
+    <div class="order-header">
+        <div>
+            <h2>Order #{{ order.id }}</h2>
+            <p style="color: #7f8c8d;">Placed on {{ order.created_at|date:"F d, Y at h:i A" }}</p>
+        </div>
+        <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+    </div>
+    
+    <div class="info-grid">
+        <div class="info-section">
+            <h3>Shipping Address</h3>
+            <p>
+                {{ order.first_name }} {{ order.last_name }}<br>
+                {{ order.address }}<br>
+                {{ order.city }}, {{ order.postal_code }}
+            </p>
+        </div>
+        
+        <div class="info-section">
+            <h3>Contact Information</h3>
+            <p>
+                <strong>Email:</strong> {{ order.email }}<br>
+                <strong>Order Total:</strong> ${{ order.total }}
+            </p>
+        </div>
+    </div>
+    
+    <h3>Order Items</h3>
+    <table class="order-items-table">
+        <thead>
+            <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in order.items.all %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>${{ item.price }}</td>
+                <td>{{ item.quantity }}</td>
+                <td><strong>${{ item.price|floatformat:2 }}</strong></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="text-align: right; font-weight: bold;">Total:</td>
+                <td><strong style="font-size: 1.3rem; color: #27ae60;">${{ order.total }}</strong></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <a href="{% url 'orders:order_history' %}" class="btn">← Back to Order History</a>
+</div>
+{% endblock %}
+

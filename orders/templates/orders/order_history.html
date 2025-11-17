@@ -1,0 +1,53 @@
+{% extends "store/base.html" %}
+
+{% block title %}Order History - eCommerce Store{% endblock %}
+
+{% block content %}
+<style>
+    .orders-container { background: white; padding: 2rem; border-radius: 8px; }
+    .order-card { border: 1px solid #ecf0f1; border-radius: 8px; padding: 1.5rem; margin-bottom: 1.5rem; }
+    .order-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 2px solid #ecf0f1; }
+    .order-status { padding: 0.5rem 1rem; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .status-processing { background: #cce5ff; color: #004085; }
+    .status-shipped { background: #d1ecf1; color: #0c5460; }
+    .status-delivered { background: #d4edda; color: #155724; }
+    .status-cancelled { background: #f8d7da; color: #721c24; }
+</style>
+
+<div class="orders-container">
+    <h2>Order History</h2>
+    
+    {% if orders %}
+        {% for order in orders %}
+        <div class="order-card">
+            <div class="order-header">
+                <div>
+                    <h3>Order #{{ order.id }}</h3>
+                    <p style="color: #7f8c8d; margin-top: 0.25rem;">{{ order.created_at|date:"F d, Y" }}</p>
+                </div>
+                <span class="order-status status-{{ order.status }}">{{ order.get_status_display }}</span>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2rem; margin-bottom: 1rem;">
+                <div>
+                    <strong>Total:</strong> ${{ order.total }}
+                </div>
+                <div>
+                    <strong>Items:</strong> {{ order.items.count }}
+                </div>
+                <div>
+                    <strong>Ship to:</strong> {{ order.city }}
+                </div>
+            </div>
+            
+            <a href="{% url 'orders:order_detail' order.id %}" class="btn">View Details</a>
+        </div>
+        {% endfor %}
+    {% else %}
+        <p style="text-align: center; color: #7f8c8d; padding: 3rem;">No orders yet. <a href="{% url 'store:product_list' %}">Start shopping!</a></p>
+    {% endif %}
+</div>
+{% endblock %}
+
+
