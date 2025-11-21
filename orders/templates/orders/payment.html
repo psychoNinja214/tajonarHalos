@@ -1,0 +1,160 @@
+{% extends "store/base.html" %}
+
+{% block title %}Payment - Order #{{ order.id }}{% endblock %}
+
+{% block content %}
+<style>
+    .payment-container { max-width: 600px; margin: 0 auto; background: white; padding: 2rem; border-radius: 8px; }
+    .order-summary-box { background: #ecf0f1; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+    .summary-total { font-size: 1.5rem; font-weight: bold; color: #27ae60; padding-top: 1rem; border-top: 2px solid #bdc3c7; margin-top: 1rem; }
+    
+    #payment-form { margin-top: 2rem; }
+    #card-element { background: white; padding: 1rem; border: 1px solid #ddd; border-radius: 4px; margin-bottom: 1rem; }
+    #card-errors { color: #e74c3c; margin-top: 0.5rem; font-size: 0.9rem; }
+    
+    #submit-button { width: 100%; padding: 1rem; background: #27ae60; color: white; border: none; border-radius: 4px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+    #submit-button:hover:not(:disabled) { background: #229954; }
+    #submit-button:disabled { background: #95a5a6; cursor: not-allowed; }
+    
+    .spinner { display: none; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    
+    .payment-info { background: #d1ecf1; border-left: 4px solid #0c5460; padding: 1rem; margin-bottom: 2rem; color: #0c5460; border-radius: 4px; }
+    .secure-badge { display: flex; align-items: center; gap: 0.5rem; color: #27ae60; font-weight: 600; margin-top: 1rem; }
+</style>
+
+<div class="payment-container">
+    <h2>💳 Payment</h2>
+    
+    <div class="payment-info">
+        <strong>Test Mode:</strong> Use card number <code>4242 4242 4242 4242</code> with any future expiry date, any CVC, and any ZIP code.
+    </div>
+    
+    <div class="order-summary-box">
+        <h3>Order Summary</h3>
+        
+        <div class="summary-row">
+            <span>Order Number:</span>
+            <strong>#{{ order.id }}</strong>
+        </div>
+        
+        <div class="summary-row">
+            <span>Items:</span>
+            <strong>{{ order.items.count }}</strong>
+        </div>
+        
+        <div class="summary-row">
+            <span>Shipping to:</span>
+            <strong>{{ order.city }}, {{ order.postal_code }}</strong>
+        </div>
+        
+        <div class="summary-total">
+            <div style="display: flex; justify-content: space-between;">
+                <span>Total:</span>
+                <span>${{ order.total }}</span>
+            </div>
+        </div>
+    </div>
+    
+    <h3>Card Details</h3>
+    
+    <form id="payment-form">
+        <div id="card-element"></div>
+        <div id="card-errors" role="alert"></div>
+        
+        <button id="submit-button" type="submit">
+            <span id="button-text">Pay ${{ order.total }}</span>
+            <div class="spinner" id="spinner"></div>
+        </button>
+        
+        <div class="secure-badge">
+            🔒 Secure payment powered by Stripe
+        </div>
+    </form>
+    
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'orders:checkout' %}" style="color: #7f8c8d; text-decoration: none;">← Back to checkout</a>
+    </div>
+</div>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    const stripe = Stripe('{{ stripe_publishable_key }}');
+    const elements = stripe.elements();
+
+    // Custom styling
+    const style = {
+        base: {
+            fontSize: '16px',
+            color: '#32325d',
+            fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif',
+            '::placeholder': {
+                color: '#aab7c4'
+            }
+        },
+        invalid: {
+            color: '#e74c3c',
+            iconColor: '#e74c3c'
+        }
+    };
+
+    // Create card element
+    const cardElement = elements.create('card', {style: style});
+    cardElement.mount('#card-element');
+
+    // Handle real-time validation errors
+    cardElement.on('change', function(event) {
+        const displayError = document.getElementById('card-errors');
+        if (event.error) {
+            displayError.textContent = event.error.message;
+        } else {
+            displayError.textContent = '';
+        }
+    });
+
+    // Handle form submission
+    const form = document.getElementById('payment-form');
+    const submitButton = document.getElementById('submit-button');
+    const buttonText = document.getElementById('button-text');
+    const spinner = document.getElementById('spinner');
+
+    form.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        // Disable button and show spinner
+        submitButton.disabled = true;
+        buttonText.style.display = 'none';
+        spinner.style.display = 'inline-block';
+
+        // Confirm the payment
+        const {error, paymentIntent} = await stripe.confirmCardPayment(
+            '{{ client_secret }}',
+            {
+                payment_method: {
+                    card: cardElement,
+                    billing_details: {
+                        name: '{{ order.first_name }} {{ order.last_name }}',
+                        email: '{{ order.email }}'
+                    }
+                }
+            }
+        );
+
+        if (error) {
+            // Show error to customer
+            const errorElement = document.getElementById('card-errors');
+            errorElement.textContent = error.message;
+
+            // Re-enable button
+            submitButton.disabled = false;
+            buttonText.style.display = 'inline';
+            spinner.style.display = 'none';
+        } else {
+            // Payment succeeded
+            if (paymentIntent.status === 'succeeded') {
+                window.location.href = "{% url 'orders:payment_success' order.id %}?payment_intent=" + paymentIntent.id;
+            }
+        }
+    });
+</script>
+{% endblock %}
